@@ -1013,6 +1013,7 @@ public abstract class BaseGenericObjectPool<T> {
          * any actions taken are under the class loader of the factory
          * associated with the pool.
          */
+        // 执行 evict(); ensureMinIdle()
         @Override
         public void run() {
             ClassLoader savedClassLoader =

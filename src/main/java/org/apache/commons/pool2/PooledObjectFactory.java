@@ -70,6 +70,11 @@ package org.apache.commons.pool2;
  *
  * @since 2.0
  */
+// 与类相关的工厂方法
+// 创建、销毁。
+// 以及有效性验证操作；有效性验证的时机？
+// object是否有idle timeout机制？
+// object选择策略是？
 public interface PooledObjectFactory<T> {
   /**
    * Create an instance that can be served by the pool and wrap it in a

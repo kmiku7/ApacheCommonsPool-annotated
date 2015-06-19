@@ -76,6 +76,12 @@ import org.apache.commons.pool2.UsageTracking;
  *
  * @since 2.0
  */
+// 可以检查并移除idle一定时间的对象，并确保最少的对象个数。
+// 通过一个"idle object eviction"线程实现，线程“异步执行”？？什么意思？
+// 清理线程 与 用户线程 竞争访问池中对象，因此频率太高会影响性能。
+// 
+
+
 public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
         implements ObjectPool<T>, GenericObjectPoolMXBean, UsageTracking<T> {
 
@@ -152,6 +158,7 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
      *
      * @see #setMaxIdle
      */
+    // 默认8
     @Override
     public int getMaxIdle() {
         return maxIdle;
@@ -730,6 +737,7 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
      * Successive activations of this method examine objects in sequence,
      * cycling through objects in oldest-to-youngest order.
      */
+    // 清理线程最终执行的这个函数
     @Override
     public void evict() throws Exception {
         assertOpen();
@@ -749,10 +757,12 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
 
                 for (int i = 0, m = getNumTests(); i < m; i++) {
                     if (evictionIterator == null || !evictionIterator.hasNext()) {
+                        // idleObjects肯定是从头迭代，那么也就是说所有object是轮询的
                         evictionIterator = new EvictionIterator(idleObjects);
                     }
                     if (!evictionIterator.hasNext()) {
                         // Pool exhausted, nothing to do here
+                        // 耗尽，新建迭代器，还是耗尽，那就是真没了
                         return;
                     }
 
@@ -988,6 +998,9 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
      *
      * @return The number of objects to test for validity
      */
+    // 每次evict检测多少个对象。
+    // 整数是个绝对值
+    // 负数则是按比例检测
     private int getNumTests() {
         int numTestsPerEvictionRun = getNumTestsPerEvictionRun();
         if (numTestsPerEvictionRun >= 0) {
@@ -1130,6 +1143,7 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
      * #_maxActive}. Map keys are pooled objects, values are the PooledObject
      * wrappers used internally by the pool.
      */
+    // maxActive应该就是pool最多管理的对象数，这样的话就好理解了。
     private final Map<IdentityWrapper<T>, PooledObject<T>> allObjects =
         new ConcurrentHashMap<IdentityWrapper<T>, PooledObject<T>>();
     /*

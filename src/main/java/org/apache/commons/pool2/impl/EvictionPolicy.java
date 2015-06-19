@@ -42,6 +42,7 @@ public interface EvictionPolicy<T> {
      * @return <code>true</code> if the object should be evicted, otherwise
      *             <code>false</code>
      */
+    // 接口为何这样定义，这些参数都是必须的？
     boolean evict(EvictionConfig config, PooledObject<T> underTest,
             int idleCount);
 }

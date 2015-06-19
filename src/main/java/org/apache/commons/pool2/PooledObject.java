@@ -31,6 +31,8 @@ import java.util.Deque;
  *
  * @since 2.0
  */
+// 封装了与object相关的信息
+// 也是个接口，具体实现是与Pool的实现对应的。
 public interface PooledObject<T> extends Comparable<PooledObject<T>> {
 
     /**

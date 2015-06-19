@@ -28,6 +28,7 @@ package org.apache.commons.pool2.impl;
  *
  * @since 2.0
  */
+// 额外增加三个配置项: maxTotal, maxIdle, minIdle
 public class GenericObjectPoolConfig extends BaseObjectPoolConfig {
 
     /**

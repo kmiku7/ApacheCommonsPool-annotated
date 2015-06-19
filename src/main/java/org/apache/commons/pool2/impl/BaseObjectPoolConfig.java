@@ -56,6 +56,7 @@ public abstract class BaseObjectPoolConfig implements Cloneable {
      * @see GenericObjectPool#getMinEvictableIdleTimeMillis()
      * @see GenericKeyedObjectPool#getMinEvictableIdleTimeMillis()
      */
+    // 30分钟
     public static final long DEFAULT_MIN_EVICTABLE_IDLE_TIME_MILLIS =
             1000L * 60L * 30L;
 
