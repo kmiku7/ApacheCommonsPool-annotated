@@ -58,6 +58,7 @@ import java.util.concurrent.locks.ReentrantLock;
  *
  * @since 2.0
  */
+// 继承自Deque，增加了阻塞功能。
 class LinkedBlockingDeque<E> extends AbstractQueue<E>
         implements Deque<E>, Serializable {
 
@@ -147,6 +148,7 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
     private final int capacity;
 
     /** Main lock guarding all access */
+    // 包里自己实现的结构
     private final InterruptibleReentrantLock lock;
 
     /** Condition for waiting takes */
@@ -169,6 +171,7 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
      * @param fairness true means threads waiting on the deque should be served
      * as if waiting in a FIFO request queue
      */
+    // 阻塞唤醒策略
     public LinkedBlockingDeque(boolean fairness) {
         this(Integer.MAX_VALUE, fairness);
     }
@@ -192,12 +195,14 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
      * as if waiting in a FIFO request queue
      * @throws IllegalArgumentException if {@code capacity} is less than 1
      */
+    // fairness是Lock自带的功能点.
     public LinkedBlockingDeque(int capacity, boolean fairness) {
         if (capacity <= 0) {
             throw new IllegalArgumentException();
         }
         this.capacity = capacity;
         lock = new InterruptibleReentrantLock(fairness);
+        // 注意初始化, 条件变量是与锁关联的.
         notEmpty = lock.newCondition();
         notFull = lock.newCondition();
     }
@@ -212,6 +217,7 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
      * @throws NullPointerException if the specified collection or any
      *         of its elements are null
      */
+    // 集合拷贝构造,此时"不会在满时阻塞"
     public LinkedBlockingDeque(Collection<? extends E> c) {
         this(Integer.MAX_VALUE);
         lock.lock(); // Never contended, but necessary for visibility
@@ -253,6 +259,8 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
             f.prev = x;
         }
         ++count;
+        // 唤醒一个等待对象,signalAll()唤醒所有.
+        // 唤醒哪一个的策略是? 随机? FIFO? LIFO?
         notEmpty.signal();
         return true;
     }

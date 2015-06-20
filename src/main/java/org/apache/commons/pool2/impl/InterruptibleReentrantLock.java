@@ -29,6 +29,7 @@ import java.util.concurrent.locks.ReentrantLock;
  *
  * @since 2.0
  */
+// 仅仅是暴露一个接口
 class InterruptibleReentrantLock extends ReentrantLock {
 
     private static final long serialVersionUID = 1L;

@@ -390,6 +390,7 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
      * instance is created, activated and (if applicable) validated and returned
      * to the caller. If validation fails, a <code>NoSuchElementException</code>
      * is thrown.
+     *              不选择继续create new object吗？
      * <p>
      * If the pool is exhausted (no available idle instances and no capacity to
      * create new ones), this method will either block (if
@@ -439,6 +440,7 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
             if (blockWhenExhausted) {
                 p = idleObjects.pollFirst();
                 if (p == null) {
+                    // 在达到maxActive的时候返回null
                     p = create();
                     if (p != null) {
                         create = true;
@@ -518,10 +520,10 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
                     }
                 }
             }
-        }
+        } // end while(p==null)
 
         updateStatsBorrow(p, System.currentTimeMillis() - waitTime);
-
+        // 走到这里的一定p!=null, p==null的情况都在while内部代码里return或throw了
         return p.getObject();
     }
 
